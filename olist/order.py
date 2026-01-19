@@ -110,7 +110,15 @@ class Order:
         Returns a DataFrame with:
         order_id, number_of_sellers
         """
-        pass  # YOUR CODE HERE
+        # $CHALLENGIFY_BEGIN
+        data = self.data
+        sellers = \
+            data['order_items']\
+            .groupby('order_id')['seller_id'].nunique().reset_index()
+        sellers.columns = ['order_id', 'number_of_sellers']
+
+        return sellers
+        # $CHALLENGIFY_END
 
     def get_price_and_freight(self):
         """
