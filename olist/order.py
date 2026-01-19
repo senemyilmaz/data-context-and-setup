@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+
 from olist.utils import haversine_distance
 from olist.data import Olist
 
@@ -19,8 +20,44 @@ class Order:
         [order_id, wait_time, expected_wait_time, delay_vs_expected, order_status]
         and filters out non-delivered orders unless specified
         """
-        # Hint: Within this instance method, you have access to the instance of the class Order in the variable self, as well as all its attributes
-        pass  # YOUR CODE HERE
+        orders = self.data['orders'].copy()
+
+        if is_delivered:
+            orders = orders.query("order_status == 'delivered'").copy()
+
+        # datetime
+        orders.loc[:, 'order_delivered_customer_date'] = pd.to_datetime(
+            orders['order_delivered_customer_date'], errors='coerce'
+        )
+        orders.loc[:, 'order_estimated_delivery_date'] = pd.to_datetime(
+            orders['order_estimated_delivery_date'], errors='coerce'
+        )
+        orders.loc[:, 'order_purchase_timestamp'] = pd.to_datetime(
+            orders['order_purchase_timestamp'], errors='coerce'
+        )
+
+        # delay vs expected (hours)
+        orders.loc[:, 'delay_vs_expected'] = (
+            orders['order_delivered_customer_date'] - orders['order_estimated_delivery_date']
+        ) / np.timedelta64(24, 'h')
+
+        # keep only positive delays
+        orders.loc[:, 'delay_vs_expected'] = orders['delay_vs_expected'].clip(lower=0)
+
+        # wait time (hours)
+        orders.loc[:, 'wait_time'] = (
+            orders['order_delivered_customer_date'] - orders['order_purchase_timestamp']
+        ) / np.timedelta64(24, 'h')
+
+        # expected wait time (hours)
+        orders.loc[:, 'expected_wait_time'] = (
+            orders['order_estimated_delivery_date'] - orders['order_purchase_timestamp']
+        ) / np.timedelta64(24, 'h')
+
+        return orders[[
+            'order_id', 'wait_time', 'expected_wait_time', 'delay_vs_expected',
+            'order_status'
+        ]]
 
     def get_review_score(self):
         """
