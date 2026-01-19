@@ -125,8 +125,16 @@ class Order:
         Returns a DataFrame with:
         order_id, price, freight_value
         """
-        pass  # YOUR CODE HERE
+        # $CHALLENGIFY_BEGIN
+        data = self.data
+        price_freight = \
+            data['order_items']\
+            .groupby('order_id',
+                     as_index=False).agg({'price': 'sum',
+                                          'freight_value': 'sum'})
 
+        return price_freight
+        # $CHALLENGIFY_END
     # Optional
     def get_distance_seller_customer(self):
         """
