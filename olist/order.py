@@ -220,4 +220,22 @@ class Order:
         'distance_seller_customer']
         """
         # Hint: make sure to re-use your instance methods defined above
-        pass  # YOUR CODE HERE
+        # $CHALLENGIFY_BEGIN
+        training_set =\
+            self.get_wait_time(is_delivered)\
+                .merge(
+                self.get_review_score(), on='order_id'
+            ).merge(
+                self.get_number_items(), on='order_id'
+            ).merge(
+                self.get_number_sellers(), on='order_id'
+            ).merge(
+                self.get_price_and_freight(), on='order_id'
+            )
+        # Skip heavy computation of distance_seller_customer unless specified
+        if with_distance_seller_customer:
+            training_set = training_set.merge(
+                self.get_distance_seller_customer(), on='order_id')
+
+        return training_set.dropna()
+        # $CHALLENGIFY_END
