@@ -64,14 +64,46 @@ class Order:
         Returns a DataFrame with:
         order_id, dim_is_five_star, dim_is_one_star, review_score
         """
-        pass  # YOUR CODE HERE
+        # $CHALLENGIFY_BEGIN
+        # import data
+        reviews = self.data['order_reviews']
 
+        def dim_five_star(d):
+            if d == 5:
+                return 1
+            else:
+                return 0
+
+        def dim_one_star(d):
+            if d == 1:
+                return 1
+            else:
+                return 0
+
+        reviews.loc[:, 'dim_is_five_star'] =\
+            reviews['review_score'].apply(dim_five_star)
+
+        reviews.loc[:, 'dim_is_one_star'] =\
+            reviews['review_score'].apply(dim_one_star)
+
+        return reviews[[
+            'order_id', 'dim_is_five_star', 'dim_is_one_star', 'review_score'
+        ]]
+        # $CHALLENGIFY_END
     def get_number_items(self):
         """
         Returns a DataFrame with:
         order_id, number_of_items
         """
-        pass  # YOUR CODE HERE
+        # $CHALLENGIFY_BEGIN
+        data = self.data
+        items = \
+            data['order_items']\
+            .groupby('order_id',
+                     as_index=False).agg({'order_item_id': 'count'})
+        items.columns = ['order_id', 'number_of_items']
+        return items
+        # $CHALLENGIFY_END
 
     def get_number_sellers(self):
         """
