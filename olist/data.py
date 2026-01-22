@@ -58,4 +58,3 @@ class Olist:
 
     def ping(self):
         return "pong"
->>>>>>> 42b1754 (Add get_wait_time method and delay handling to Order class)
